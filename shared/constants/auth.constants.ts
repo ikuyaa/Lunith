@@ -1,0 +1,1 @@
+export const SIGNUP_PATH_STARTSWITH = '/sign-up/email';
