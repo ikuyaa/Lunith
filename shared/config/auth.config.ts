@@ -1,7 +1,7 @@
 /* These are not .env variables so we can use them in the frontend as constants. */
 
 //User
-export const ENABLE_EMAIL_CHANGING = true;
+export const ENABLE_USER_EMAIL_CHANGING = true;
 
 //Password
 export const MAX_PASSWORD_LENGTH = 64;

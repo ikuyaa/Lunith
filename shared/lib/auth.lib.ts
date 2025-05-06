@@ -10,7 +10,7 @@ import { userRolesPlugin } from "../plugins/auth/userRoles";
 import { EmailType, type EmailSendParams } from "@backend/utils/email.utils";
 import { emailQueue } from "@backend/jobs/queues/email.queue";
 import { uClient } from "@backend/index";
-import { COOKIE_CACHE_ENABLED, COOKIE_CACHE_MAX_AGE, ENABLE_EMAIL_CHANGING, ENABLE_EMAIL_SIGNUP, MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH, PASSWORD_RESET_TOKEN_EXPIRE, RATE_LIMITING_ENABLED, RATE_LIMITING_MAX_REQUESTS, RATE_LIMITING_WINDOW, REQUIRE_EMAIL_VERIFICATION } from "shared/config/auth.config";
+import { COOKIE_CACHE_ENABLED, COOKIE_CACHE_MAX_AGE, ENABLE_USER_EMAIL_CHANGING, ENABLE_EMAIL_SIGNUP, MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH, PASSWORD_RESET_TOKEN_EXPIRE, RATE_LIMITING_ENABLED, RATE_LIMITING_MAX_REQUESTS, RATE_LIMITING_WINDOW, REQUIRE_EMAIL_VERIFICATION } from "shared/config/auth.config";
 import { account, user } from "../drizzle/schema/user.schema";
 import { session, verification } from '../drizzle/schema/auth.schema';
 import type { TypedUser } from "../types/auth.types";
@@ -39,7 +39,7 @@ export const auth = betterAuth({
     ],
     user: {
         changeEmail: {
-            enabled: ENABLE_EMAIL_CHANGING,
+            enabled: ENABLE_USER_EMAIL_CHANGING,
         },
         deleteUser: {
             enabled: true,

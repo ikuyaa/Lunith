@@ -31,8 +31,8 @@ const apiRoutes = app.basePath('/api')
 .on(['POST', 'GET'], '/auth/*', (c) => auth.handler(c.req.raw))
 
 //Serve the frontend app
-app.get('*', serveStatic({ root: '../.dist/frontend/' }));
-app.get('*', serveStatic({ path: '../.dist/frontend/index.html' }));
+app.get('*', serveStatic({ root: './dist/frontend/' }));
+app.get('*', serveStatic({ path: './dist/frontend/index.html' }));
 
 serve({
     fetch: app.fetch,
