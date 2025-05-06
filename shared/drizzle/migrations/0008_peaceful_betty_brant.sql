@@ -1,1 +1,0 @@
-ALTER TABLE "nodes" ALTER COLUMN "id" SET DEFAULT '6entnpccma7layjz';

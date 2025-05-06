@@ -9,15 +9,8 @@ export const userRolesPlugin = () => ({
                     type: 'string',
                     required: true,
                     input: false,
-                    defaultValue: 'BASE_USER',
-                    
+                    defaultValue: 'BASE_USER',       
                 },
-                employeeRole: {
-                    type: 'string',
-                    required: false,
-                    input: false,
-                    defaultValue: null,
-                }
             }
         }
     },

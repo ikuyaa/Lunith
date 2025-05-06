@@ -1,3 +1,5 @@
+CREATE TYPE "public"."node_status" AS ENUM('ONLINE', 'ERROR', 'OFFLINE', 'MAINTENANCE');--> statement-breakpoint
+CREATE TYPE "public"."userRole" AS ENUM('BASE_USER', 'SUBSCRIBER', 'CUSTOMER_SUPPORT', 'MODERATOR', 'ADMIN', 'ROOT');--> statement-breakpoint
 CREATE TABLE "session" (
 	"id" text PRIMARY KEY NOT NULL,
 	"userId" text NOT NULL,
@@ -19,6 +21,20 @@ CREATE TABLE "verification" (
 	"updatedAt" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "nodes" (
+	"id" text PRIMARY KEY DEFAULT '6entnf44mabran3a' NOT NULL,
+	"token" text NOT NULL,
+	"name" text NOT NULL,
+	"description" text,
+	"location" text,
+	"ipAddress" text,
+	"ipv4Address" text,
+	"status" "node_status" DEFAULT 'OFFLINE' NOT NULL,
+	"createdAt" timestamp DEFAULT now() NOT NULL,
+	"updatedAt" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "nodes_token_unique" UNIQUE("token")
+);
+--> statement-breakpoint
 CREATE TABLE "account" (
 	"id" text PRIMARY KEY NOT NULL,
 	"userId" text NOT NULL,
@@ -38,14 +54,19 @@ CREATE TABLE "account" (
 CREATE TABLE "user" (
 	"id" text PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
+	"username" text NOT NULL,
+	"displayUsername" text,
+	"userRole" "userRole" DEFAULT 'BASE_USER' NOT NULL,
+	"dateOfBirth" timestamp NOT NULL,
 	"email" text NOT NULL,
 	"emailVerified" boolean DEFAULT false,
 	"image" text,
 	"createdAt" timestamp DEFAULT now() NOT NULL,
 	"updatedAt" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "user_id_unique" UNIQUE("id"),
+	CONSTRAINT "user_username_unique" UNIQUE("username"),
 	CONSTRAINT "user_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
-ALTER TABLE "session" ADD CONSTRAINT "session_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "account" ADD CONSTRAINT "account_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;
+ALTER TABLE "session" ADD CONSTRAINT "session_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "account" ADD CONSTRAINT "account_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;

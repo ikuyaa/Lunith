@@ -2,14 +2,26 @@ import { relations } from "drizzle-orm";
 import { boolean, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { session } from "./auth.schema";
 
-export const UserRoles = pgEnum('userRole', [
-    "BASE_USER",
-    "SUBSCRIBER",
-    "CUSTOMER_SUPPORT",
-    "MODERATOR",
-    "ADMIN",
-    "ROOT"
-])
+const userRoleValues = [ 
+    "BASE_USER", 
+    "SUBSCRIBER", 
+    "CUSTOMER_SUPPORT", 
+    "MODERATOR", 
+    "ADMIN", 
+    "ROOT" 
+];
+
+export const UserRoles = pgEnum('userRole',[ 
+    "BASE_USER", 
+    "SUBSCRIBER", 
+    "CUSTOMER_SUPPORT", 
+    "MODERATOR", 
+    "ADMIN", 
+    "ROOT" 
+]);
+export type UserRole = typeof UserRoles.enumValues[number]; 
+
+export const UserRoleObject = Object.fromEntries(UserRoles.enumValues.map(role => [role, role]));
 
 
 export const user = pgTable('user', {
