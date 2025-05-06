@@ -16,8 +16,11 @@ export const shard = pgTable('shards', {
     updatedAt: timestamp('updatedAt', {mode: 'date'}).notNull().defaultNow().$onUpdate(() => new Date()),
 })
 
-export const shardRelations = relations(shard, ({ many }) => ({
-    locations: many(shardLocation),
+export const shardRelations = relations(shard, ({ one }) => ({
+    locations: one(shardLocation, {
+        fields: [shard.id],
+        references: [shardLocation.id],
+    }),
 }));
 
 //Add servers to this later.
@@ -31,4 +34,4 @@ export const shardLocation = pgTable('shard_locations', {
 
 export const shardLocationRelations = relations(shardLocation, ({ many }) => ({    
     shards: many(shard),
-}))
+}));
