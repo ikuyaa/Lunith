@@ -7,7 +7,7 @@ interface HeroSparklesTextProps {
 export function HeroSparklesText({text }: HeroSparklesTextProps) {
   return (
     <div className={`w-full flex flex-col bg-transparent items-center justify-center overflow-hidden rounded-md relative`}>
-      <h1 className={`md:text-6xl text-5xl lg:text-8xl font-bold text-center dark:text-white text-primary relative z-20 pr-26`}>
+      <h1 className={`md:text-6xl text-5xl lg:text-8xl font-bold text-center dark:text-white text-primary relative z-20 pr-24`}>
         {text}
       </h1>
       <div className="w-[40rem] h-40 relative">

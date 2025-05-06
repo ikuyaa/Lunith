@@ -5,7 +5,7 @@ import { DropdownMenuLabel } from "@radix-ui/react-dropdown-menu"
 import { Link, useNavigate, useRouter } from "@tanstack/react-router"
 import { Button } from "../ui/button"
 import { useMutation } from "@tanstack/react-query"
-import { logoutUser } from "@/utils/auth-client"
+import { isUserAdmin, logoutUser } from "@/utils/auth-client"
 import { toast } from "sonner"
 import AvatarAdmin from "./avatar/avatar-admin"
 
@@ -20,7 +20,7 @@ const NavbarAvatar = ({ user }: NavbarAvatarProps) => {
 
   const navigate = useNavigate();
   const router = useRouter();
-  const isAdmin = true; //CHANGE THIS 
+  const isAdmin = isUserAdmin(user);
 
 
   const mutation = useMutation({
@@ -55,10 +55,12 @@ const NavbarAvatar = ({ user }: NavbarAvatarProps) => {
           <DropdownMenuGroup className="flex flex-col items-center justify-center space-y-2 w-full">
             <NavbarAvatarItem title="Profile" to={'/'} />    
           </DropdownMenuGroup>
-          <DropdownMenuSeparator />
             {
               isAdmin === true && (
-                <AvatarAdmin />
+                <>
+                  <DropdownMenuSeparator />
+                  <AvatarAdmin />
+                </>
               )
             }
           <DropdownMenuSeparator />

@@ -11,12 +11,21 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as AdminRouteImport } from './routes/admin/route'
 import { Route as IndexImport } from './routes/index'
 import { Route as AuthVerifyEmailImport } from './routes/auth/verify-email'
 import { Route as AuthRegisterImport } from './routes/auth/register'
 import { Route as AuthLoginImport } from './routes/auth/login'
+import { Route as AdminShardsManageImport } from './routes/admin/shards/manage'
+import { Route as AdminShardsLocationsImport } from './routes/admin/shards/locations'
 
 // Create/Update Routes
+
+const AdminRouteRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
@@ -42,6 +51,18 @@ const AuthLoginRoute = AuthLoginImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const AdminShardsManageRoute = AdminShardsManageImport.update({
+  id: '/shards/manage',
+  path: '/shards/manage',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+
+const AdminShardsLocationsRoute = AdminShardsLocationsImport.update({
+  id: '/shards/locations',
+  path: '/shards/locations',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -51,6 +72,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRoute
     }
     '/auth/login': {
@@ -74,44 +102,104 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthVerifyEmailImport
       parentRoute: typeof rootRoute
     }
+    '/admin/shards/locations': {
+      id: '/admin/shards/locations'
+      path: '/shards/locations'
+      fullPath: '/admin/shards/locations'
+      preLoaderRoute: typeof AdminShardsLocationsImport
+      parentRoute: typeof AdminRouteImport
+    }
+    '/admin/shards/manage': {
+      id: '/admin/shards/manage'
+      path: '/shards/manage'
+      fullPath: '/admin/shards/manage'
+      preLoaderRoute: typeof AdminShardsManageImport
+      parentRoute: typeof AdminRouteImport
+    }
   }
 }
 
 // Create and export the route tree
 
+interface AdminRouteRouteChildren {
+  AdminShardsLocationsRoute: typeof AdminShardsLocationsRoute
+  AdminShardsManageRoute: typeof AdminShardsManageRoute
+}
+
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminShardsLocationsRoute: AdminShardsLocationsRoute,
+  AdminShardsManageRoute: AdminShardsManageRoute,
+}
+
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
+  '/admin/shards/locations': typeof AdminShardsLocationsRoute
+  '/admin/shards/manage': typeof AdminShardsManageRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
+  '/admin/shards/locations': typeof AdminShardsLocationsRoute
+  '/admin/shards/manage': typeof AdminShardsManageRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
+  '/admin/shards/locations': typeof AdminShardsLocationsRoute
+  '/admin/shards/manage': typeof AdminShardsManageRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth/login' | '/auth/register' | '/auth/verify-email'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/auth/login'
+    | '/auth/register'
+    | '/auth/verify-email'
+    | '/admin/shards/locations'
+    | '/admin/shards/manage'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth/login' | '/auth/register' | '/auth/verify-email'
-  id: '__root__' | '/' | '/auth/login' | '/auth/register' | '/auth/verify-email'
+  to:
+    | '/'
+    | '/admin'
+    | '/auth/login'
+    | '/auth/register'
+    | '/auth/verify-email'
+    | '/admin/shards/locations'
+    | '/admin/shards/manage'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/auth/login'
+    | '/auth/register'
+    | '/auth/verify-email'
+    | '/admin/shards/locations'
+    | '/admin/shards/manage'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
   AuthLoginRoute: typeof AuthLoginRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
   AuthVerifyEmailRoute: typeof AuthVerifyEmailRoute
@@ -119,6 +207,7 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
   AuthLoginRoute: AuthLoginRoute,
   AuthRegisterRoute: AuthRegisterRoute,
   AuthVerifyEmailRoute: AuthVerifyEmailRoute,
@@ -135,6 +224,7 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/admin",
         "/auth/login",
         "/auth/register",
         "/auth/verify-email"
@@ -142,6 +232,13 @@ export const routeTree = rootRoute
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/admin": {
+      "filePath": "admin/route.tsx",
+      "children": [
+        "/admin/shards/locations",
+        "/admin/shards/manage"
+      ]
     },
     "/auth/login": {
       "filePath": "auth/login.tsx"
@@ -151,6 +248,14 @@ export const routeTree = rootRoute
     },
     "/auth/verify-email": {
       "filePath": "auth/verify-email.tsx"
+    },
+    "/admin/shards/locations": {
+      "filePath": "admin/shards/locations.tsx",
+      "parent": "/admin"
+    },
+    "/admin/shards/manage": {
+      "filePath": "admin/shards/manage.tsx",
+      "parent": "/admin"
     }
   }
 }

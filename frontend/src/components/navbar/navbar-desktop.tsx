@@ -13,16 +13,16 @@ interface NavbarDesktopProps {
 
 const NavbarDesktop = ({ user }: NavbarDesktopProps) => {
   return (
-    <div className="flex items-center justify-between w-full px-4 py-2">
+    <div className="flex items-center justify-between w-full px-4 py-2 border-b-[1.5px] border-b-muted relative">
       {/* Left Side */}
       <div className="flex-1 flex items-center justify-start">
-        <div className="w-[50px] h-[50px] overflow-hidden flex items-center justify-center pb-3">
+        <div className="w-[50px] h-[50px] overflow-hidden flex items-center justify-center">
           <img src={Logo} className="w-full h-full object-cover object-center" />
         </div>
-        <p className="text-2xl pb-4 cursor-default">{import.meta.env.VITE_APP_NAME}</p>
+        <p className="text-2xl pb-1 cursor-default">{import.meta.env.VITE_APP_NAME}</p>
       </div>
       {/* Center */}
-      <div className="flex-1 flex items-center justify-center space-x-4">
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center space-x-4">
         <NavbarLink
           to='/'
           title="Home"

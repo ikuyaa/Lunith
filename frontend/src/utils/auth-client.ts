@@ -88,7 +88,7 @@ export async function logoutUser() {
     }
 }
 
-export async function isUserAdmin(user: TypedUser) {
+export function isUserAdmin(user: TypedUser) {
     if(!user) 
         return false;
     const userRole = user.userRole as UserRole;
