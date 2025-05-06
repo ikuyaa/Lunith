@@ -1,15 +1,8 @@
-# lunith
+# Lunith :stars:
 
-To install dependencies:
-
-```bash
-bun install
-```
-
-To run:
-
-```bash
-bun run 
-```
-
-This project was created using `bun init` in bun v1.2.11. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+## To clone this project:
+- Clone the repo
+- bun i inside of the root folder
+- bun i inside of the frontend folder
+- bun run dev in root for backend
+- bun run dev in /frontend for frontend dev server
