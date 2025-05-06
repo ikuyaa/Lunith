@@ -4,7 +4,7 @@ import { usernameClient } from "better-auth/client/plugins";
 import { userRolesClientPlugin } from '@shared/plugins/auth/userRoles/client';
 import { type LoginFormValues, type RegisterFormValues } from "@shared/schemas/auth.schemas";
 import { capitalizeName } from "./user.utils";
-import { type TypedUser } from "@shared/types/auth.types";
+import { type TypedSession, type TypedUser } from "@shared/types/auth.types";
 import { UserRoles } from "@shared/drizzle/schema/user.schema";
 import { type UserRole } from '@shared/drizzle/schema/user.schema';
 export const authClient = createAuthClient({
@@ -26,8 +26,8 @@ export async function validateSession() {
     }
 
     return {
-        user: session.data.user,
-        session: session.data.session,
+        user: session.data.user as TypedUser,
+        session: session.data.session as TypedSession,
     }
 
 }
@@ -88,9 +88,22 @@ export async function logoutUser() {
     }
 }
 
-export function isUserAdmin(user: TypedUser) {
-    if(!user) 
+export const requireUserRole = (user: TypedUser, requiredRole: UserRole) => {
+    if (!user) {
+        console.log('No user provided');
         return false;
+    }
     const userRole = user.userRole as UserRole;
-    return userRole === UserRoles.enumValues[4] || userRole === UserRoles.enumValues[5];    
+    const userIndex = UserRoles.enumValues.indexOf(userRole);
+    const requiredIndex = UserRoles.enumValues.indexOf(requiredRole);
+    console.log(`User role: ${userRole}, Required role: ${requiredRole}`);
+    console.log(`User index: ${userIndex}, Required index: ${requiredIndex}`);
+    if (userIndex === -1 || requiredIndex === -1) {
+        console.log('Invalid role detected');
+        return false;
+    }
+    const result = userIndex >= requiredIndex;
+    console.log(`Access granted: ${result}`);
+    return result;
 }
+

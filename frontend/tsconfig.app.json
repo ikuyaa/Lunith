@@ -10,6 +10,7 @@
     "paths": {
       "@/*": [ "./src/*" ],
       "@shared/*": ["../shared/*"],
+      "@backend/*": ["../backend/*"],
     },
     /* Bundler mode */
     "moduleResolution": "bundler",

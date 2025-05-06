@@ -221,6 +221,16 @@ body {
   letter-spacing: var(--tracking-normal);
 }
 
+@keyframes fade-in-out {
+  0%,100% { opacity: 0; pointer-events: none; }
+  10%,90% { opacity: 1; pointer-events: auto; }
+}
+.animate-fade-in-out {
+  animation: fade-in-out 0.4s;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

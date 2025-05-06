@@ -9,6 +9,7 @@ import { serveStatic } from "hono/bun";
 import { websocket, websocketApp } from "./websockets/websockets";
 import { serve } from "bun";
 import { Log } from "@shared/lib/logger.lib";
+import { shardApp } from "./routes/shard.routes";
 
 const app = new Hono<HonoContext>();
 app.use("*", logger());
@@ -29,6 +30,7 @@ validSessionCheck(app);
 /* eslint-disable @typescript-eslint/no-unused-vars */
 const apiRoutes = app.basePath('/api')
 .on(['POST', 'GET'], '/auth/*', (c) => auth.handler(c.req.raw))
+.route('/shard', shardApp)
 
 //Serve the frontend app
 app.get('*', serveStatic({ root: './dist/frontend/' }));

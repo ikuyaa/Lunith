@@ -1,5 +1,5 @@
 {
-  "id": "a3b66536-a107-4058-afed-fd1e84546bbf",
+  "id": "017db5ff-315a-4fec-a660-2583a8086d6c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -140,8 +140,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.nodes": {
-      "name": "nodes",
+    "public.shards": {
+      "name": "shards",
       "schema": "",
       "columns": {
         "id": {
@@ -149,7 +149,7 @@
           "type": "text",
           "primaryKey": true,
           "notNull": true,
-          "default": "'6entnf44mabran3a'"
+          "default": "'6entn7l0mac6a5od'"
         },
         "token": {
           "name": "token",
@@ -169,12 +169,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "location": {
-          "name": "location",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "ipAddress": {
           "name": "ipAddress",
           "type": "text",
@@ -189,7 +183,7 @@
         },
         "status": {
           "name": "status",
-          "type": "node_status",
+          "type": "shard_status",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true,
@@ -214,11 +208,64 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "nodes_token_unique": {
-          "name": "nodes_token_unique",
+        "shards_token_unique": {
+          "name": "shards_token_unique",
           "nullsNotDistinct": false,
           "columns": [
             "token"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.shard_locations": {
+      "name": "shard_locations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "shard_locations_name_unique": {
+          "name": "shard_locations_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "name"
           ]
         }
       },
@@ -441,8 +488,8 @@
     }
   },
   "enums": {
-    "public.node_status": {
-      "name": "node_status",
+    "public.shard_status": {
+      "name": "shard_status",
       "schema": "public",
       "values": [
         "ONLINE",

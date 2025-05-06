@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1746490407535,
-      "tag": "0000_swift_rocket_racer",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1746496304031,
-      "tag": "0001_noisy_snowbird",
+      "when": 1746515579208,
+      "tag": "0000_gifted_slipstream",
       "breakpoints": true
     }
   ]

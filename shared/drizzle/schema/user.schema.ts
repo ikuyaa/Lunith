@@ -21,7 +21,9 @@ export const UserRoles = pgEnum('userRole',[
 ]);
 export type UserRole = typeof UserRoles.enumValues[number]; 
 
-export const UserRoleObject = Object.fromEntries(UserRoles.enumValues.map(role => [role, role]));
+export const UserRoleTypes = Object.fromEntries(
+    UserRoles.enumValues.map((role) => [role, role])
+) as Record<UserRole, UserRole>;
 
 
 export const user = pgTable('user', {

@@ -1,4 +1,4 @@
-CREATE TYPE "public"."node_status" AS ENUM('ONLINE', 'ERROR', 'OFFLINE', 'MAINTENANCE');--> statement-breakpoint
+CREATE TYPE "public"."shard_status" AS ENUM('ONLINE', 'ERROR', 'OFFLINE', 'MAINTENANCE');--> statement-breakpoint
 CREATE TYPE "public"."userRole" AS ENUM('BASE_USER', 'SUBSCRIBER', 'CUSTOMER_SUPPORT', 'MODERATOR', 'ADMIN', 'ROOT');--> statement-breakpoint
 CREATE TABLE "session" (
 	"id" text PRIMARY KEY NOT NULL,
@@ -21,18 +21,26 @@ CREATE TABLE "verification" (
 	"updatedAt" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "nodes" (
-	"id" text PRIMARY KEY DEFAULT '6entnf44mabran3a' NOT NULL,
+CREATE TABLE "shards" (
+	"id" text PRIMARY KEY DEFAULT '6entn7l0mac6a5od' NOT NULL,
 	"token" text NOT NULL,
 	"name" text NOT NULL,
 	"description" text,
-	"location" text,
 	"ipAddress" text,
 	"ipv4Address" text,
-	"status" "node_status" DEFAULT 'OFFLINE' NOT NULL,
+	"status" "shard_status" DEFAULT 'OFFLINE' NOT NULL,
 	"createdAt" timestamp DEFAULT now() NOT NULL,
 	"updatedAt" timestamp DEFAULT now() NOT NULL,
-	CONSTRAINT "nodes_token_unique" UNIQUE("token")
+	CONSTRAINT "shards_token_unique" UNIQUE("token")
+);
+--> statement-breakpoint
+CREATE TABLE "shard_locations" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"name" text NOT NULL,
+	"description" text,
+	"createdAt" timestamp DEFAULT now() NOT NULL,
+	"updatedAt" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "shard_locations_name_unique" UNIQUE("name")
 );
 --> statement-breakpoint
 CREATE TABLE "account" (

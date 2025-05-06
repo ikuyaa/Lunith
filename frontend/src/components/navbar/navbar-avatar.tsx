@@ -5,9 +5,10 @@ import { DropdownMenuLabel } from "@radix-ui/react-dropdown-menu"
 import { Link, useNavigate, useRouter } from "@tanstack/react-router"
 import { Button } from "../ui/button"
 import { useMutation } from "@tanstack/react-query"
-import { isUserAdmin, logoutUser } from "@/utils/auth-client"
+import { logoutUser, requireUserRole } from "@/utils/auth-client"
 import { toast } from "sonner"
 import AvatarAdmin from "./avatar/avatar-admin"
+import { UserRoleTypes } from '@shared/drizzle/schema/user.schema';
 
 
 interface NavbarAvatarProps {
@@ -20,7 +21,7 @@ const NavbarAvatar = ({ user }: NavbarAvatarProps) => {
 
   const navigate = useNavigate();
   const router = useRouter();
-  const isAdmin = isUserAdmin(user);
+  const isAdmin = requireUserRole(user, UserRoleTypes.ADMIN)
 
 
   const mutation = useMutation({
@@ -52,7 +53,7 @@ const NavbarAvatar = ({ user }: NavbarAvatarProps) => {
         <DropdownMenuContent className="w-[180px] mt-2 font-jersey15">
           <DropdownMenuLabel className="text-center text-lg">@{user.username}</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuGroup className="flex flex-col items-center justify-center space-y-2 w-full">
+          <DropdownMenuGroup asChild className="flex flex-col items-center justify-center space-y-2 w-full">
             <NavbarAvatarItem title="Profile" to={'/'} />    
           </DropdownMenuGroup>
             {

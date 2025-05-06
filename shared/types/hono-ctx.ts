@@ -1,4 +1,4 @@
-import type { auth } from "@lib/auth.lib"
+import type { auth } from "../lib/auth.lib"
 
 export type HonoContext = {
     Variables: {
