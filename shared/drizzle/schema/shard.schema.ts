@@ -30,7 +30,7 @@ export const shardLocation = pgTable('shard_locations', {
     description: text('description'),
     createdAt: timestamp('createdAt', {mode: 'date'}).notNull().defaultNow(),
     updatedAt: timestamp('updatedAt', {mode: 'date'}).notNull().defaultNow().$onUpdate(() => new Date()),   
-})
+});
 
 export const shardLocationRelations = relations(shardLocation, ({ many }) => ({    
     shards: many(shard),

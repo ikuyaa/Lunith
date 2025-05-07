@@ -1,6 +1,7 @@
 import type { APIRoutes } from "@backend/index";
 import { BAD_REQUEST, INTERNAL_SERVER_ERROR, OK } from "@shared/constants/status-codes.conastants";
 import type { AddShardLocationSchema } from "@shared/schemas/shard.schemas";
+import type { ShardLocation } from "@shared/types/shard.types";
 import { hc } from "hono/client";
 
 export const apiClient = hc<APIRoutes>("/");
@@ -21,7 +22,7 @@ export async function createShardLocation(data: AddShardLocationSchema) {
         case OK:
             return message;
         case BAD_REQUEST: {
-            if(error.includes('Location already exists')) {
+            if(error?.includes('Location already exists')) {
                 throw new Error('Location already exists');
             } else {
                 throw new Error('Location is required');
@@ -35,4 +36,30 @@ export async function createShardLocation(data: AddShardLocationSchema) {
     }
 
 
+}
+
+export async function getShardLocations() {
+    const res = await apiClient.api.shard.location.all.$get({
+        headers: {
+            "Content-Type": "application/json",
+        }
+    });
+
+    const { message, error } = await res.json();
+    
+    if(error) {
+        throw new Error(error);
+    }
+
+    if(message) {
+        const shardLocations = (message as unknown as ShardLocation[]).map(loc => ({
+            ...loc,
+            createdAt: new Date(loc.createdAt),
+            updatedAt: new Date(loc.updatedAt),
+        }));
+
+        return shardLocations;
+    }
+
+    return null;
 }

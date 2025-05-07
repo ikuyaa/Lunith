@@ -9,6 +9,7 @@ import { useMutation } from '@tanstack/react-query';
 import { createShardLocation } from '@/utils/api-client';
 import { toast } from 'sonner';
 import { Textarea } from '@/components/ui/textarea';
+import { useShardLocationQuery } from '@/hooks/use-shard';
 
 const CreateShardLocationDialog = () => {
   const form = useForm<AddShardLocationSchema>({
@@ -19,11 +20,14 @@ const CreateShardLocationDialog = () => {
     },
   })
 
+  const { refetch } = useShardLocationQuery();
+
   const { mutate } = useMutation({
     mutationFn: async (data: AddShardLocationSchema) => {
       await createShardLocation(data)
     },
     onSuccess: () => {
+      refetch();
       toast.dismiss();
       toast.success('Shard location created successfully!',{
         position: 'top-right',
@@ -40,6 +44,7 @@ const CreateShardLocationDialog = () => {
   })
 
   const onSubmit = async (data: AddShardLocationSchema) => {
+    
     mutate(data);
   }
 

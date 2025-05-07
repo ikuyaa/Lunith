@@ -13,6 +13,9 @@ export const shardApp = new Hono<HonoContext>()
 .post('/location/create', async (c) => {
     return await createLocationRoute(c)
 })
+.get('/location/all', async (c) => {
+    return await getLocationsRoute(c)
+})
 
 
 async function createLocationRoute(c: Context<HonoContext, string, BlankInput>) {
@@ -39,7 +42,7 @@ async function createLocationRoute(c: Context<HonoContext, string, BlankInput>) 
     }
     //Checking if the location already exists in the database
     const existingLocation = await db.select().from(shardLocation).where(eq(shardLocation.location, location)).limit(1);
-    if(existingLocation) {
+    if(existingLocation.length > 0) {
         return c.json({ message: null, error: 'Location already exists' }, BAD_REQUEST)
     }
     
@@ -59,4 +62,23 @@ async function createLocationRoute(c: Context<HonoContext, string, BlankInput>) 
     }
 
     return c.json({ message: 'Location created successfully', error: null }, OK)
+}
+
+async function getLocationsRoute(c: Context<HonoContext, string, BlankInput>) {
+    //Getting the user from the context
+    const user = c.get('auth').user;
+
+    //Checking for user and if the user is an admin
+    if(!user || !requireUserRole(user, UserRoleTypes.ADMIN)) {
+        return c.json({ message: null, error: 'Unauthorized' }, UNAUTHORIZED)
+    }
+
+    try {
+        const locations = await db.select().from(shardLocation);
+        return c.json({ message: locations, error: null }, OK)
+    } catch (err) {
+        const error = err as Error;
+        Log.error('Error getting locations from database: ', error);
+        return c.json({ message: null, error: 'Error getting locations from database' }, INTERNAL_SERVER_ERROR)
+    }
 }
