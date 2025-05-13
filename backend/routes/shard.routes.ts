@@ -1,10 +1,10 @@
 import type { HonoContext } from "@shared/types/hono-ctx";
 import { Hono } from "hono";
-import { createLocation, deleteLocationByID, deleteMultipleLocationsByID, getLocations, updateLocationByID } from "@backend/utils/shard.utils";
+import { createShardLocation, deleteLocationByID, deleteMultipleLocationsByID, getLocations, updateLocationByID } from "@backend/utils/shard.utils";
 
 export const shardApp = new Hono<HonoContext>()
 .post('/location/create', async (c) => {
-    return await createLocation(c);
+    return await createShardLocation(c);
 })
 .get('/location/all', async (c) => {
     return await getLocations(c);

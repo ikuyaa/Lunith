@@ -21,3 +21,28 @@ export const editShardLocationSchema = z.object({
     message: "At least one field is required",   
 });
 export type EditShardLocationSchema = z.infer<typeof editShardLocationSchema>;
+
+//API Request Schemas
+export const editShardLocationRequestSchema = z.object({
+    locationId: z.string()
+        .min(1, { message: "Location ID is required" })
+        .max(1000, { message: "Location ID must be less than 1000 characters" })
+        .transform((val) => Number(val))
+        .refine((val) => !isNaN(val), { message: "Location ID must be a number" }),
+    location: z.string().min(1, { message: "Location is required" }).max(64, { message: "Location must be less than 64 characters" }),
+    description: z.string().max(244, { message: "Message cannot be longer then 244 characters." }).optional(),
+});
+
+export const createShardLocationRequestSchema = z.object({
+    location: z.string().min(1, { message: "Location is required" })
+        .max(64, { message: "Location must be less than 64 characters" }),
+    description: z.string().max(244, { message: "Message cannot be longer then 244 characters." }).optional(),
+});
+
+export const deleteShardLocationRequestSchema = z.object({
+    locationId: z.string()
+        .min(1, { message: "Location ID is required" })
+        .max(1000, { message: "Location ID must be less than 1000 characters" })
+        .transform((val) => Number(val))
+        .refine((val) => !isNaN(val), { message: "Location ID must be a number" }),
+});

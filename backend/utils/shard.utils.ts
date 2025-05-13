@@ -7,14 +7,15 @@ import type { BlankInput } from "hono/types";
 import { requireUserRole } from "./user.utils";
 import { shard, shardLocation } from "@shared/drizzle/schema/shard.schema";
 import { db } from "@shared/drizzle/db";
-import { eq, sql } from "drizzle-orm";
+import { eq, inArray, sql } from "drizzle-orm";
 import { uClient } from "..";
 import { SHARD_LOCATION_CACHE_KEY } from "@shared/constants/shard.constants";
 import type { ShardLocation } from "@shared/types/shard.types";
 import { TimeSecs } from "@shared/lib/time.lib";
+import { createShardLocationRequestSchema, deleteShardLocationRequestSchema, editShardLocationRequestSchema } from "@shared/schemas/shard.schemas";
 
 
-export async function createLocation(c: Context<HonoContext, string, BlankInput>) {
+export async function createShardLocation(c: Context<HonoContext, string, BlankInput>) {
     //Getting the user from the context
     const user = c.get('auth').user;
 
@@ -23,24 +24,11 @@ export async function createLocation(c: Context<HonoContext, string, BlankInput>
         return c.json({ message: null, error: 'Unauthorized' }, UNAUTHORIZED)
     }
 
-    const { location, description } = await c.req.json();
-    if(!location) {
-        return c.json({ message: null, error: 'Location is required' }, BAD_REQUEST)
+    const parsedData = createShardLocationRequestSchema.safeParse(await c.req.json());
+    if(!parsedData.success) {
+        return c.json({ message: null, error: parsedData.error.message }, BAD_REQUEST)
     }
-
-    //Sanitizing the location input
-    if(typeof location !== "string" || location.length > 100) {
-        return c.json({ message: null, error: 'Location must be a string and less than 100 characters' }, BAD_REQUEST)
-    }
-    //Sanitizing the description input
-    if(description && (typeof description !== "string" || description.length > 255)) {
-        return c.json({ message: null, error: 'Description must be a string and less than 255 characters' }, BAD_REQUEST)
-    }
-    //Checking if the location already exists in the database
-    const existingLocation = await db.select().from(shardLocation).where(eq(shardLocation.location, location)).limit(1);
-    if(existingLocation.length > 0) {
-        return c.json({ message: null, error: 'Location already exists' }, BAD_REQUEST)
-    }
+    const { location, description } = parsedData.data;
     
     try {
         const newLocation = await db.insert(shardLocation).values({
@@ -52,10 +40,10 @@ export async function createLocation(c: Context<HonoContext, string, BlankInput>
         await uClient.cache.set(`${SHARD_LOCATION_CACHE_KEY}${newLocation.id}`, JSON.stringify(newLocation), 'EX', TimeSecs.hours(5));
         return c.json({ message: 'Location created successfully', error: null }, OK)
     } catch (err) {
-        const error = err as Error;
+        const error = err as Error & { code?: string };
         Log.error('Error creating location in database: ', error);
         
-        if(error.message.includes("duplicate key value violates unique constraint")) {
+        if(error.code === '23505') {
             return c.json({ message: null, error: 'Location already exists' }, BAD_REQUEST)
         }
         
@@ -104,20 +92,15 @@ export async function deleteLocationByID(c: Context<HonoContext, string, BlankIn
         return c.json({ message: null, error: 'Unauthorized' }, UNAUTHORIZED)
     }
 
-    const locationId  = c.req.param('locationId')
-    if(!locationId) {
-        return c.json({ message: null, error: 'Location ID is required' }, BAD_REQUEST)
-    }
-
-
-    //Sanitizing the location input
-    if(typeof locationId !== "string" || locationId.length > 1000) {
-        return c.json({ message: null, error: 'Location must be a number and less than 100 characters' }, BAD_REQUEST)
+    //Parsing the incoming data
+    const parsedData = deleteShardLocationRequestSchema.safeParse(await c.req.json());
+    if(!parsedData.success) {
+        return c.json({ message: null, error: parsedData.error.message }, BAD_REQUEST)
     }
     
-    const id = Number(locationId);
+    const { locationId } = parsedData.data;
     try {
-        await db.delete(shardLocation).where(eq(shardLocation.id, id));
+        await db.delete(shardLocation).where(eq(shardLocation.id, locationId));
         return c.json({ message: 'Location deleted successfully', error: null }, OK)
     } catch (err) {
         const error = err as Error;
@@ -134,19 +117,21 @@ export async function deleteMultipleLocationsByID(c: Context<HonoContext, string
         return c.json({ message: null, error: 'Unauthorized' }, UNAUTHORIZED)
     }
     const locationIds = c.req.param('locationIds')
-    Log.alert('Location IDs: ' + locationIds)
     if(!locationIds) {
         return c.json({ message: null, error: 'Location IDs are required' }, BAD_REQUEST)
     }
 
+    //Converting the param into an array of numbers and checking if they are all numbers
     const ids = locationIds.split(',').map((id) => Number(id.trim()));
+    if(ids.some((id) => isNaN(id))) {
+        return c.json({ message: null, error: 'Location IDs must be numbers' }, BAD_REQUEST)
+    }
 
     Log.alert('Deleting locations with IDs: ' + ids);
 
     try {
-        ids.forEach(async (id) => {
-            await db.delete(shardLocation).where(eq(shardLocation.id, id));
-        });
+        //Deleting the locations from the database
+        await db.delete(shardLocation).where(inArray(shardLocation.id, ids));
     } catch (err) {
         const error = err as Error;
         Log.error('Error deleting locations from database: ', error);
@@ -166,25 +151,19 @@ export async function updateLocationByID(c: Context<HonoContext, string, BlankIn
         return c.json({ message: null, error: 'Unauthorized' }, UNAUTHORIZED)
     }
 
-    const { location, description, locationId } = await c.req.json();
-    Log.info(`Update request received: ${locationId} ${location} ${description}`);
-    if(!locationId || !location && !description) {
-        return c.json({ message: null, error: 'Location ID, and at least a new location or description is required' }, BAD_REQUEST)
+    const parsedData = editShardLocationRequestSchema.safeParse(await c.req.json());
+    if(!parsedData.success) {
+        return c.json({ message: null, error: parsedData.error.message }, BAD_REQUEST)
     }
+    const { locationId, location, description } = parsedData.data;
 
-    //Sanitizing the location input
-    if(typeof locationId !== "string" || locationId.length > 1000) {
-        return c.json({ message: null, error: 'Location must be a number and less than 100 characters' }, BAD_REQUEST)
-    }
-    
-    const id = Number(locationId);
     try {
-        Log.info(`Updating location in database: ${id} ${location} ${description}`);
+        Log.info(`Updating location in database: ${locationId} ${location} ${description}`);
 
         await db.update(shardLocation).set({
             location: location,
             description: description
-        }).where(eq(shardLocation.id, id));
+        }).where(eq(shardLocation.id, locationId));
 
         return c.json({ message: 'Location updated successfully', error: null }, OK)
     } catch (err) {

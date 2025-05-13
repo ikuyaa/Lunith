@@ -5,8 +5,6 @@ import type { Row, Table } from '@tanstack/react-table'
 import { MoreHorizontal } from 'lucide-react'
 import DeleteShardLocationAlert from './delete-shard-location-alert'
 import { useState } from 'react'
-import { AlertDialog } from '@/components/ui/alert-dialog'
-import { Dialog } from '@/components/ui/dialog'
 import EditShardLocationDialog from './edit-shard-location-dialog'
 
 interface ShardLocationActionsCellProps {
