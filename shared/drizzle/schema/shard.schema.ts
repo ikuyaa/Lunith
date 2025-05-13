@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { pgEnum, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+import { integer, pgEnum, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
 import uniqid from 'uniqid';
 
 export const SHARD_STATUS = pgEnum('shard_status', [ 'ONLINE', 'ERROR', 'OFFLINE', 'MAINTENANCE' ]);
@@ -9,6 +9,7 @@ export const shard = pgTable('shards', {
     token: text('token').notNull().unique(),
     name: text('name').notNull(),
     description: text('description'),
+    locationId: integer('locationId').notNull().references(() => shardLocation.id),
     ipAddress: text('ipAddress'),
     ipv4Address: text('ipv4Address'),
     status: SHARD_STATUS('status').notNull().default('OFFLINE'),
@@ -18,7 +19,7 @@ export const shard = pgTable('shards', {
 
 export const shardRelations = relations(shard, ({ one }) => ({
     locations: one(shardLocation, {
-        fields: [shard.id],
+        fields: [shard.locationId],
         references: [shardLocation.id],
     }),
 }));

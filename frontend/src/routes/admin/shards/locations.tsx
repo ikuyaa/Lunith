@@ -11,13 +11,13 @@ export const Route = createFileRoute('/admin/shards/locations')({
 function RouteComponent() {
   return (
     <div>
-      <AdminManagementCard 
+      <AdminManagementCard
         title='⋆˙⟡ Shard Locations ⟡˙⋆' 
         addButtonText='+ Create a shard location'
         dialogContent={ <CreateShardLocationDialog /> }
       >
         <div className='flex flex-col h-full'>  
-          <Card className='w-full h-[calc(100vh-22rem)] mt-4'>
+          <Card className='w-full h-[calc(100vh-22rem)] mt-4 bg-secondary'>
             <CardContent className=''>
               <ShardLocationTable />
             </CardContent>

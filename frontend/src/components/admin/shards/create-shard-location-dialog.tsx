@@ -44,8 +44,8 @@ const CreateShardLocationDialog = () => {
   })
 
   const onSubmit = async (data: AddShardLocationSchema) => {
-    
     mutate(data);
+    form.reset();
   }
 
 

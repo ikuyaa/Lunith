@@ -1,26 +1,26 @@
 import { type UseFormReturn } from 'react-hook-form';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
-import { Input } from '../ui/input';
+import { Textarea } from '../ui/textarea';
 
 interface FormInputProps {
     form: UseFormReturn<any>
     name: string;
     placeholder?: string;
-    inputType?: 'text' | 'email' | 'password' | 'number' | 'date';
     label: string;
-    confirmPassword?: boolean;
 }
 
-const FormInputControl = ({ form, name, placeholder="", inputType='text', label, confirmPassword=false }: FormInputProps) => {
+const FormTextboxControl = ({ form, name, label }: FormInputProps) => {
   return (
     <FormField
       control={form.control}
-      name={confirmPassword ? 'confirmPassword' : name} 
+      name={name} 
       render={({ field }) => (
         <FormItem className='flex flex-col items-center text-center'>
           <FormLabel className='text-xl underline underline-offset-2'>{label}</FormLabel>
           <FormControl>
-            <Input placeholder={placeholder} type={inputType} className='w-[200px] text-center text-xl placeholder:text-lg ' {...field} />
+            <Textarea 
+              className='w-[280px] text-center p-1' {...field}
+            />
           </FormControl>
             <FormMessage />
         </FormItem>
@@ -29,4 +29,4 @@ const FormInputControl = ({ form, name, placeholder="", inputType='text', label,
   )
 }
 
-export default FormInputControl
+export default FormTextboxControl

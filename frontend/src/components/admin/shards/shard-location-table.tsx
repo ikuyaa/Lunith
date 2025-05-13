@@ -1,87 +1,46 @@
-import { getShardLocations } from "@/utils/api-client"
-import { useQuery } from "@tanstack/react-query"
-import { useReactTable, type ColumnDef, getCoreRowModel, getPaginationRowModel, getSortedRowModel, getFilteredRowModel, flexRender  } from "@tanstack/react-table";
+import { flexRender, type ColumnDef  } from "@tanstack/react-table";
 import { type ShardLocation } from '@shared/types/shard.types';
-import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { shardColumnFilters, shardRowSelection, shardTableSorting } from "@/signals/shard.signals";
-import { signal } from "@preact/signals-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { DropdownMenuCheckboxItem } from "@radix-ui/react-dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useShardLocationQuery } from "@/hooks/use-shard";
-
-const shardColumnVisibility = signal<Record<string, boolean>>({});
+import { Checkbox } from "@/components/ui/checkbox";
+import TableHeaderSortable from "@/components/table/table-header-sortable";
+import ShardLocationCell from "@/components/table/shards/location/shard-location-cell";
+import TableDateCell from "@/components/table/table-date-cell";
+import ShardLocationActionsCell from "@/components/table/shards/location/shard-location-actions-cell";
+import ShardLocationActionsHeader from "@/components/table/shards/location/shard-location-action-header";
+import { useShardLocationTable } from "@/hooks/use-table";
 
 export const ShardLocationTable = () => {
-     const { data, isLoading } = useShardLocationQuery()
-
-      const table = useReactTable<ShardLocation>({
-        data: data ?? [],
-        columns,
-        getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
-        onColumnVisibilityChange: (updater) => {
-          if (typeof updater === 'function') {
-            shardColumnVisibility.value = updater(shardColumnVisibility.value);
-          } else {
-            shardColumnVisibility.value = updater;
-          }
-        },
-        onSortingChange: (updater) => {
-          if (typeof updater === 'function') {
-            shardTableSorting.value = updater(shardTableSorting.value);
-          } else {
-            shardTableSorting.value = updater;
-          }
-        },
-        onRowSelectionChange: (updater) => {
-          if (typeof updater === 'function') {
-            shardRowSelection.value = updater(shardRowSelection.value);
-          } else {
-            shardRowSelection.value = updater;
-          }
-        },
-        onColumnFiltersChange: (updater) => {
-          if (typeof updater === 'function') {
-            shardColumnFilters.value = updater(shardColumnFilters.value);
-          } else {
-            shardColumnFilters.value = updater;
-          }
-        },
-        state: {
-          columnVisibility: shardColumnVisibility.value,
-          sorting: shardTableSorting.value,
-          rowSelection: shardRowSelection.value,
-          columnFilters: shardColumnFilters.value,
-        },
-      })
-
+  const table = useShardLocationTable(columns);
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input 
           placeholder="Filter locations..."
           className="flex items-center justify-center max-w-3xs mx-auto md:block md:mx-0"
+          value={(table.getColumn('location')?.getFilterValue() as string) ?? ""}
+          onChange={(event) => {
+            table.getColumn('location')?.setFilterValue(event.target.value)
+          }}
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild className="hover:text-white">
-            <Button variant='outline' className="ml-auto">
+            <Button variant='outline' className="ml-auto text-lg">
               Columns <ChevronDown />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
+          <DropdownMenuContent className="text-lg">
             {table
               .getAllColumns()
               .filter((column) => column.getCanHide())
               .map((column) => (
                 <DropdownMenuCheckboxItem
                   key={column.id}
-                  className="capitalize font-jersey15 text-center cursor-pointer"
+                  className={`hover:bg-accent capitalize font-jersey15 text-center cursor-pointer${!column.getIsVisible() ? ' text-destructive' : ''}`}
                   checked={column.getIsVisible()}
                   onCheckedChange={(value) => 
                     column.toggleVisibility(!!value)
@@ -103,7 +62,7 @@ export const ShardLocationTable = () => {
                     <TableHead key={header.id} className="text-center">
                       {header.isPlaceholder
                         ? null
-                        :flexRender(
+                        : flexRender(
                           header.column.columnDef.header,
                           header.getContext()
                         )}
@@ -168,17 +127,16 @@ export const ShardLocationTable = () => {
 }
 
 export const columns: ColumnDef<ShardLocation>[] = [
-  {
-    id: 'shard-location-select',
+  { //Checkboxes
+    id: 'select',
     header: ({ table }) => (
       <Checkbox 
-        checked= {
-          table.getIsAllPageRowsSelected() || 
-          (table.getIsSomePageRowsSelected() &&  'indeterminate')
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
-        className="translate-x-2"
       />
     ),
     cell: ({ row }) => (
@@ -186,138 +144,90 @@ export const columns: ColumnDef<ShardLocation>[] = [
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
         aria-label="Select row"
-        className="translate-x-2"
       />
     ),
     enableSorting: false,
     enableHiding: false,
   },
-  {
+  { //ID Row/Cell
     accessorKey: 'id',
-    header: ({ column }) => (
-      <Button
-        className="translate-x-1.5"
-        variant='ghost'
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        ID
-        <ArrowUpDown />
-      </Button>
-    ),
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue('id')}</div>
-    )
+    header: ({ column }) => {
+      return (
+        <TableHeaderSortable
+          title="ID"
+          column={column}
+        />
+      ) 
+    },
+    cell: ({ row }) => <ShardLocationCell row={row} getValue="id"/>,
   },
-  {
+  { //Location Row/Cell
     accessorKey: 'location',
-    header: ({ column }) => (
-      <Button
-        className="translate-x-1.5"
-        variant='ghost'
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        Location
-        <ArrowUpDown />
-      </Button>
-    ),
-    cell: ({ row }) => <div>{row.getValue('location')}</div>
+    header: ({ column }) => {
+      return (
+        <TableHeaderSortable
+          title="Location"
+          column={column}
+        />
+      ) 
+    },
+    cell: ({ row }) => <ShardLocationCell row={row} getValue="location"/>,
   },
-  {
+  { //Description Row/Cell
     accessorKey: 'description',
-    header: ({ column }) => (
-      <Button
-        className="translate-x-1.5"
-        variant='ghost'
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        Description
-        <ArrowUpDown />
-      </Button>
-    ),
-    cell: ({ row }) => (
-      <div>{row.getValue('description')}</div>
-    )
+    header: ({ column }) => {
+      return (
+        <TableHeaderSortable
+          title="Description"
+          column={column}
+        />
+      ) 
+    },
+    cell: ({ row }) => <div className="flex items-center justify-center"><ShardLocationCell row={row} getValue="description" description/></div>,
   },
-  {
+  { //Shards Row/Cell
+    accessorKey: 'shards',
+    header: ({ column }) => {
+      return (
+        <TableHeaderSortable
+          title="Shards"
+          column={column}
+        />
+      ) 
+    },
+    cell: ({ row }) => <ShardLocationCell row={row} getValue="shards"/>,
+  },
+  { //Created At Row/Cell
     accessorKey: 'createdAt',
     header: ({ column }) => {
       return (
-        <Button
-          className="translate-x-1.5"
-          variant='ghost'
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Created At
-          <ArrowUpDown />
-        </Button>
-      )
+        <TableHeaderSortable
+          title="Created At"
+          column={column}
+        />
+      ) 
     },
-    cell: ({ row }) => {
-      const date = new Date(row.getValue('createdAt'));
-      return (
-        <div className="capitalize">{date.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit',
-        })}</div>
-      )
-    },
+    cell: ({ row }) => < TableDateCell row={row} getValue="createdAt" />
   },
-  {
+  { //Updated At Row/Cell
     accessorKey: 'updatedAt',
     header: ({ column }) => {
       return (
-        <Button
-          className="translate-x-1.5"
-          variant='ghost'
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Updated At
-          <ArrowUpDown />
-        </Button>
-      )
+        <TableHeaderSortable
+          title="Updated At"
+          column={column}
+        />
+      ) 
     },
-    cell: ({ row }) => {
-      const date = new Date(row.getValue('updatedAt'));
-      return (
-        <div className="capitalize">{date.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit',
-        })}</div>
-      )
-    },
+    cell: ({ row }) => < TableDateCell row={row} getValue="updatedAt" />
   },
-  {
+  { //Actions Row/Cell
     id: 'actions',
     enableHiding: false,
-    cell: ({ row }) => {
-      const location = row.original;
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant='ghost' className="h-8 w-8 p-0">
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="font-jersey15 text-center translate-x-[35%]">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => {navigator.clipboard.writeText(location.id.toString())}}
-              
-            >
-              <p className="text-center mx-auto cursor-pointer">Copy location ID</p>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem><p className="text-center mx-auto cursor-pointer">Edit</p></DropdownMenuItem>
-            <DropdownMenuItem className="text-destructive cursor-pointer"><p className="text-center mx-auto">Delete</p></DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
-    },
+    header: ({ column, table }) => <ShardLocationActionsHeader column={column} table={table}/>,
+    cell: ({ row, table }) => <ShardLocationActionsCell row={row} table={table} />
   }
 ]
+
+
+

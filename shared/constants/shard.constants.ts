@@ -1,0 +1,1 @@
+export const SHARD_LOCATION_CACHE_KEY = '[shard-location]:';

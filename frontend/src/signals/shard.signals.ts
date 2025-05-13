@@ -8,3 +8,5 @@ export const shardTableSorting = signal<SortingState>([]);
 export const shardColumnFilters = signal<ColumnFiltersState>([])
 export const shardColumnVisibility = signal<VisibilityState>({});
 export const shardRowSelection = signal({});
+
+export const isShardDeleteWarningDialogOpen = signal(false);

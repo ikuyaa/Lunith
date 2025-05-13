@@ -1,5 +1,13 @@
 # Lunith :stars:
 
+## Current stack
+- Runtime: Bun
+- Backend: Hono (Serves the build frontend also)
+- Frontend: Vite w Tanstack Router
+- ORM: Drizzle
+- Cache: Redis
+- Database: PostgreSQL
+
 ## To clone this project:
 - Clone the repo
 - bun i inside of the root folder

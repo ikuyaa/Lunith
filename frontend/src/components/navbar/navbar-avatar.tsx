@@ -81,9 +81,9 @@ interface NavbarAvatarItemProps extends React.ComponentProps<typeof Link> {
 export const NavbarAvatarItem = ({ to, title }: NavbarAvatarItemProps) => {
 
     return (
-        <DropdownMenuItem className="hover:bg-accent transition-2 w-full mx-auto">
-          <Link to={to} className="text-center w-full font-normal transition-2 text-lg">
-            {title}
+        <DropdownMenuItem asChild className="hover:bg-accent transition-2 w-full mx-auto">
+          <Link to={to}>
+            <p className="text-center w-full font-normal transition-2 text-lg">{title}</p>
           </Link>
         </DropdownMenuItem>
     )

@@ -4,7 +4,7 @@ import { NavbarAvatarItem } from "../navbar-avatar"
 
 const AvatarAdmin = () => {
   return (
-    <DropdownMenuGroup asChild className="flex flex-col items-center justify-center space-y-2 w-full">
+    <DropdownMenuGroup className="flex flex-col items-center justify-center space-y-2 w-full">
       <NavbarAvatarItem title="Admin Panel" to={'/admin'} />    
     </DropdownMenuGroup>
   )
