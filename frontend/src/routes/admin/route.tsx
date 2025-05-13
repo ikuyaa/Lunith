@@ -7,7 +7,7 @@ import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/admin')({
   component: RouteComponent,
-  loader: async () => {
+  beforeLoad: async () => {
     const { user } = await validateSession();
     const isAdmin = requireUserRole(user as TypedUser, UserRoleTypes.ADMIN);
     if(!isAdmin) {
@@ -16,7 +16,7 @@ export const Route = createFileRoute('/admin')({
         replace: true,
       })
     }
-
+    
     return {
       user,
     }
