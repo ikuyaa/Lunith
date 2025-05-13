@@ -1,6 +1,6 @@
 import AdminManagementCard from '@/components/admin/admin-mgmt-card';
-import CreateShardLocationDialog from '@/components/admin/shards/create-shard-location-dialog';
-import { ShardLocationTable } from '@/components/admin/shards/shard-location-table';
+import CreateShardLocationDialog from '@/components/admin/shards/location/create-shard-location-dialog';
+import { ShardLocationTable } from '@/components/admin/shards/location/shard-location-table';
 import { Card, CardContent} from '@/components/ui/card';
 import { createFileRoute } from '@tanstack/react-router'
 

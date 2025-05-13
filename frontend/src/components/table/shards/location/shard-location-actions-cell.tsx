@@ -6,6 +6,7 @@ import { MoreHorizontal } from 'lucide-react'
 import DeleteShardLocationAlert from './delete-shard-location-alert'
 import { useState } from 'react'
 import EditShardLocationDialog from './edit-shard-location-dialog'
+import { useShardLocationDeleteMutation } from '@/hooks/use-shard'
 
 interface ShardLocationActionsCellProps {
     row: Row<ShardLocation>
@@ -16,6 +17,7 @@ const ShardLocationActionsCell = ({ row, table }: ShardLocationActionsCellProps)
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [alertOpen, setAlertOpen] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const { mutate: deleteShard } = useShardLocationDeleteMutation()
   return (
     <>
     <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
@@ -59,10 +61,14 @@ const ShardLocationActionsCell = ({ row, table }: ShardLocationActionsCellProps)
     </DropdownMenu>
     
     {/* Dialogs */}
-    <DeleteShardLocationAlert 
+    <DeleteShardLocationAlert
+      title={`You are about to delete ${row.getValue('location')}. Are you sure?`}
       alertOpen={alertOpen}
       setAlertOpen={setAlertOpen}
-      row={row}
+      onDelete={() => {
+        console.log('Deleting shard location:', row.original.id)  
+        deleteShard(row.original.id.toString())
+      }}
     />
     <EditShardLocationDialog 
       dialogOpen={dialogOpen}

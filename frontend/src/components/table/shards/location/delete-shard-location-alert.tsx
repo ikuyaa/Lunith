@@ -1,30 +1,27 @@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { useShardLocationDeleteMutation } from '@/hooks/use-shard';
-import type { ShardLocation } from '@shared/types/shard.types';
-import type { Row } from '@tanstack/react-table';
 
 interface DeleteShardLocationAlertProps {
+  title: string;
+  description?: string;
   alertOpen: boolean;
   setAlertOpen: (open: boolean) => void;
-  row: Row<ShardLocation>;
+  onDelete: () => void;
 }
 
-const DeleteShardLocationAlert = ({ alertOpen, setAlertOpen, row }: DeleteShardLocationAlertProps) => {
-  const { mutate } = useShardLocationDeleteMutation();
-
+const DeleteShardLocationAlert = ({ alertOpen, setAlertOpen, title, onDelete, description="This action cannot be undone." }: DeleteShardLocationAlertProps) => {
   return (
     <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
       <AlertDialogContent className='font-jersey15 -translate-y-48'>
         <AlertDialogHeader>
-        <AlertDialogTitle className='text-3xl text-center'>{`You are about to delete ${row.getValue('location')}. Are you sure?`}</AlertDialogTitle>
+        <AlertDialogTitle className='text-3xl text-center'>{title}</AlertDialogTitle>
         <AlertDialogDescription className='text-center text-xl text-destructive font-bold'>
-            This action cannot be undone.
+          {description}
         </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className='flex justify-center mx-auto'>
         <AlertDialogAction
         onClick={() => {
-          mutate(row.getValue('id'));
+          onDelete();
           setAlertOpen(false);
         }}
         className='text-lg bg-destructive hover:bg-destructive'

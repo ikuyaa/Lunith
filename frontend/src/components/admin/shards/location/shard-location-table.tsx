@@ -217,14 +217,14 @@ export const columns: ColumnDef<ShardLocation>[] = [
           title="Updated At"
           column={column}
         />
-      ) 
+      )
     },
-    cell: ({ row }) => < TableDateCell row={row} getValue="updatedAt" />
+    cell: ({ row }) => <TableDateCell row={row} getValue="updatedAt" />
   },
   { //Actions Row/Cell
     id: 'actions',
     enableHiding: false,
-    header: ({ column, table }) => <ShardLocationActionsHeader column={column} table={table}/>,
+    header: ({ table }) => <ShardLocationActionsHeader table={table}/>,
     cell: ({ row, table }) => <ShardLocationActionsCell row={row} table={table} />
   }
 ]

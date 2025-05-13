@@ -93,7 +93,7 @@ export async function deleteLocationByID(c: Context<HonoContext, string, BlankIn
     }
 
     //Parsing the incoming data
-    const parsedData = deleteShardLocationRequestSchema.safeParse(await c.req.json());
+    const parsedData = deleteShardLocationRequestSchema.safeParse(c.req.param());
     if(!parsedData.success) {
         return c.json({ message: null, error: parsedData.error.message }, BAD_REQUEST)
     }
