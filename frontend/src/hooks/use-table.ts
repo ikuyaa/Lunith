@@ -55,3 +55,14 @@ export const useShardLocationTable = (columns: ColumnDef<ShardLocation>[]) => {
   return shardLocationTable;
 }
 
+export const useShardManageTable = (columns: ColumnDef<ShardLocation>[]) => {
+  //Table should contain
+  // - Status
+  // - ID
+  // - Name
+  // - Description
+  // - Location
+  // - Visibility
+
+}
+

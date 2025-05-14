@@ -18,8 +18,10 @@ function RouteComponent() {
       >
         <div className='flex flex-col h-full'>  
           <Card className='w-full h-[calc(100vh-22rem)] mt-4 bg-secondary'>
-            <CardContent className=''>
-              <ShardLocationTable />
+            <CardContent className='h-full p-0'>
+              <div className='h-full overflow-y-auto px-4'>
+                <ShardLocationTable />
+              </div>
             </CardContent>
           </Card>
         </div>

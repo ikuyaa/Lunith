@@ -53,7 +53,7 @@ export const ShardLocationTable = () => {
         </DropdownMenu>
       </div>
       <div className="rounded-md border">
-        <Table>
+        <Table className="">
           <TableHeader className="justify-start">
             { table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>

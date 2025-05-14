@@ -20,8 +20,8 @@ const CreateShardLocationDialog = () => {
     },
   })
 
+  //Move this to the use-shard script
   const { refetch } = useShardLocationQuery();
-
   const { mutate } = useMutation({
     mutationFn: async (data: AddShardLocationSchema) => {
       await createShardLocation(data)

@@ -1,5 +1,7 @@
 # Lunith :stars:
 
+# **PROJECT IS IN PROGRESS AND INCOMPLETE**
+
 ## Overview
 - Shard system to connect docker instances to the frontend via websockets
 - Frontend with authentication to manage servers, user, shards, etc...

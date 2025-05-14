@@ -12,7 +12,9 @@ import { uClient } from "..";
 import { SHARD_LOCATION_CACHE_KEY } from "@shared/constants/shard.constants";
 import type { ShardLocation } from "@shared/types/shard.types";
 import { TimeSecs } from "@shared/lib/time.lib";
-import { createShardLocationRequestSchema, deleteShardLocationRequestSchema, editShardLocationRequestSchema } from "@shared/schemas/shard.schemas";
+import { createShardSchema, createShardLocationRequestSchema, deleteShardLocationRequestSchema, editShardLocationRequestSchema } from "@shared/schemas/shard.schemas";
+import uniqid from 'uniqid';
+import { Jwt } from "hono/utils/jwt";
 
 
 export async function createShardLocation(c: Context<HonoContext, string, BlankInput>) {
@@ -170,5 +172,58 @@ export async function updateLocationByID(c: Context<HonoContext, string, BlankIn
         const error = err as Error;
         Log.error('Error updating location in database: ', error);
         return c.json({ message: null, error: 'Error updating location in database' }, INTERNAL_SERVER_ERROR)
+    }
+}
+
+//NEEDS REDIS CACHING
+export async function createShard(c: Context<HonoContext, string, BlankInput>) {
+    //Getting the user from the context
+    const user = c.get('auth').user;
+
+    //Checking for user and if the user is an admin
+    if(!user || !requireUserRole(user, UserRoleTypes.ADMIN)) {
+        return c.json({ message: null, error: 'Unauthorized' }, UNAUTHORIZED)
+    }
+
+    //Parsing the incoming data
+    const parsedData = createShardSchema.safeParse(await c.req.json());
+    if(!parsedData.success) {
+        return c.json({ message: null, error: parsedData.error.message }, BAD_REQUEST)
+    }
+    const { name, description, locationId, totalMemMB, totalDiskSpaceMB, totalCPUCores, daemonFileDirectory } = parsedData.data;
+
+    //Generating a unique ID for the shard
+    const shardId = uniqid();
+
+    //Generate a signed unique token for the shard
+    const token = await Jwt.sign({
+        id: shardId,
+        name,
+        description
+    },
+    process.env.SHARD_JWT_SECRET)
+
+    try {
+        await db.insert(shard).values({
+            id: shardId,
+            token,
+            name,
+            description: description || null,
+            locationId,
+            totalMemMB,
+            totalDiskSpaceMB,
+            totalCPUCores,
+            daemonFileDirectory,
+            createdBy: user.id,
+        });
+
+        return c.json({ message: 'Shard created successfully', error: null }, OK)
+    } catch (err) {
+        const error = err as Error & { code?: string };
+        Log.error('Error creating shard in database: ', error);
+        if(error.code === '23505') {
+            return c.json({ message: null, error: 'Shard already exists' }, BAD_REQUEST)
+        }
+        return c.json({ message: null, error: 'Error creating shard in database' }, INTERNAL_SERVER_ERROR)
     }
 }
